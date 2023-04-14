@@ -1,10 +1,12 @@
 import path from 'path';
 import { Command } from 'commander';
-import { serve } from 'local-api';
+import { serve } from '@js-notebook/local-api';
 
 interface LocalApiError {
   code: string;
 }
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 export const serveCommand = new Command()
   .command('serve [filename]')
@@ -17,7 +19,12 @@ export const serveCommand = new Command()
 
     try {
       const dir = path.join(process.cwd(), path.dirname(filename));
-      await serve(parseInt(options.port), path.basename(filename), dir);
+      await serve(
+        parseInt(options.port),
+        path.basename(filename),
+        dir,
+        !isProduction
+      );
       console.log(
         `Opened ${filename}. Navigate to http://localhost:${options.port} to edit the file.`
       );
